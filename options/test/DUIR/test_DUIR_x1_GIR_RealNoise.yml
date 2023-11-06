@@ -1,0 +1,61 @@
+# general settings
+name: DUIR_M_x1_GIR_lstm_v3_0.8_blind_RealNoise
+model_type: DUIRModel
+scale: 1
+num_gpu: 1 # set num_gpu: 0 for cpu mode
+manual_seed: 10
+debug: false
+
+# dataset and data loader settings
+datasets:
+
+  val:
+    name: SIDD
+    type: GIRTrainDataset
+#    type: RealBlurDataset
+    dataroot_gt: ./datasets/degraded_imgs
+    dataroot_lq: ./datasets/degraded_imgs
+#    meta_info_file: ./data/meta_info/meta_info_WED_DIV2K_BSD_Flickr2k_RealNoise_val.txt
+    meta_info_file: ./data/meta_info/meta_info_WED_DIV2K_BSD_Flickr2k_train_woHQ.txt
+    # change to 'meta_info_REDSofficial4_test_GT' when use the official validation partition
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  type: DynEDSR
+  num_in_ch: 3
+  num_feat: 64
+  num_block: 32
+  res_scale: 1
+  img_range: 255.0
+  rgb_mean: [0.4488, 0.4371, 0.4040]
+  kernel_size: 3
+  weight_ratio: 0.8
+  attn: true
+  blind: true
+
+
+# path
+path:
+#  pretrain_network_g: /home/lhm/PycharmProject/GIR/experiments/DAGIR_M_x1_lstm_v3_40L_blind_96_0.8_train/models/net_g_300000.pth
+  pretrain_network_g: /home/lhm/PycharmProject/GIR/experiments/DAGIR_lstm_v3_32L_blind_0.8_train_RealNoise2/models/net_g_140000.pth
+  strict_load_g: true
+  resume_state: ~
+
+
+# validation settings
+val:
+  suffix: DAGIR
+  save_img: true
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
+
